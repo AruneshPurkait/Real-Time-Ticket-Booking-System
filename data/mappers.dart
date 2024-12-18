@@ -1,12 +1,16 @@
-import 'dart:convert';
+import 'package:built_collection/built_collection.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart' hide Category;
+import 'package:tuple/tuple.dart';
 
-import '../data/remote/response/full_reservation_response.dart';
-import '../data/remote/response/product_response.dart';
-import '../data/remote/response/promotion_response.dart';
-import '../domain/model/age_type.dart';
+import '../domain/model/card.dart';
 import '../domain/model/category.dart';
+import '../domain/model/comment.dart';
+import '../domain/model/comments.dart';
 import '../domain/model/location.dart';
 import '../domain/model/movie.dart';
+import '../domain/model/movie_and_showtimes.dart';
+import '../domain/model/notification.dart';
 import '../domain/model/person.dart';
 import '../domain/model/product.dart';
 import '../domain/model/promotion.dart';
@@ -14,67 +18,54 @@ import '../domain/model/reservation.dart';
 import '../domain/model/seat.dart';
 import '../domain/model/show_time.dart';
 import '../domain/model/theatre.dart';
+import '../domain/model/theatre_and_show_times.dart';
 import '../domain/model/ticket.dart';
 import '../domain/model/user.dart';
 import '../utils/utils.dart';
 import 'local/user_local.dart';
-import 'remote/request/movie_request.dart';
+import 'remote/response/card_response.dart';
 import 'remote/response/category_response.dart';
+import 'remote/response/comment_response.dart';
+import 'remote/response/comments_response.dart';
+import 'remote/response/full_reservation_response.dart';
+import 'remote/response/movie_and_show_time_response.dart';
+import 'remote/response/movie_detail_response.dart';
 import 'remote/response/movie_response.dart';
+import 'remote/response/notification_response.dart';
 import 'remote/response/person_response.dart';
+import 'remote/response/product_response.dart';
+import 'remote/response/promotion_response.dart';
+import 'remote/response/reservation_response.dart';
+import 'remote/response/show_time_and_theatre_response.dart';
 import 'remote/response/show_time_response.dart';
 import 'remote/response/theatre_response.dart';
 import 'remote/response/ticket_response.dart';
 import 'remote/response/user_response.dart';
 
 UserLocal userResponseToUserLocal(UserResponse response) {
-  return UserLocal(
-    uid: response.uid,
-    email: response.email,
-    phone_number: response.phone_number,
-    full_name: response.full_name,
-    gender: response.gender,
-    avatar: response.avatar,
-    address: response.address,
-    birthday: response.birthday,
-    location: response.location == null
-        ? null
-        : LocationLocal(
-            latitude: response.location.latitude,
-            longitude: response.location.longitude,
-          ),
-    is_completed: response.is_completed,
-    is_active: response.is_active ?? true,
-    role: response.role,
-    theatreResponseString:
-        response.theatre == null ? null : jsonEncode(response.theatre),
-  );
-}
+  return UserLocal((b) {
+    final latitude = response.location?.latitude;
+    final longitude = response.location?.longitude;
 
-User userLocalToUserDomain(UserLocal local) {
-  return User(
-    uid: local.uid,
-    email: local.email,
-    phoneNumber: local.phone_number,
-    fullName: local.full_name,
-    gender: stringToGender(local.gender),
-    avatar: local.avatar,
-    address: local.address,
-    birthday: local.birthday,
-    location: local.location == null
-        ? null
-        : Location(
-            latitude: local.location.latitude,
-            longitude: local.location.longitude,
-          ),
-    isCompleted: local.is_completed,
-    isActive: local.is_active ?? true,
-    role: local.role.parseToRole(),
-    theatre: local.theatreResponseString == null
-        ? null
-        : theatreResponseToTheatre(
-            TheatreResponse.fromRawJson(local.theatreResponseString)),
-  );
+    final locationLocalBuilder = latitude != null && longitude != null
+        ? (LocationLocalBuilder()
+          ..latitude = latitude
+          ..longitude = longitude)
+        : null;
+
+    b
+      ..uid = response.uid
+      ..email = response.email
+      ..phoneNumber = response.phoneNumber
+      ..fullName = response.fullName
+      ..gender = response.gender
+      ..avatar = response.avatar
+      ..address = response.address
+      ..birthday = response.birthday
+      ..location = locationLocalBuilder
+      ..isCompleted = response.isCompleted
+      ..isActive = response.isActive ?? true;
+  });
 }
 
 Gender stringToGender(String s) {
@@ -87,173 +78,267 @@ Gender stringToGender(String s) {
   throw Exception("Cannot convert string '$s' to gender");
 }
 
-extension RoleResponse on String {
-  Role parseToRole() {
-    return this == 'ADMIN'
-        ? Role.ADMIN
-        : this == 'STAFF'
-            ? Role.STAFF
-            : Role.USER;
-  }
+User userLocalToUserDomain(UserLocal local) {
+  return User((b) {
+    final location = local.location;
+
+    b
+      ..uid = local.uid
+      ..email = local.email
+      ..phoneNumber = local.phoneNumber
+      ..fullName = local.fullName
+      ..gender = stringToGender(local.gender)
+      ..avatar = local.avatar
+      ..address = local.address
+      ..birthday = local.birthday
+      ..location = location != null
+          ? (LocationBuilder()
+            ..latitude = location.latitude
+            ..longitude = location.longitude)
+          : null
+      ..isCompleted = local.isCompleted
+      ..isActive = local.isActive;
+  });
 }
 
-User userResponseToUserDomain(UserResponse response) {
-  return User(
-    uid: response.uid,
-    email: response.email,
-    phoneNumber: response.phone_number,
-    fullName: response.full_name,
-    gender: stringToGender(response.gender),
-    avatar: response.avatar,
-    address: response.address,
-    birthday: response.birthday,
-    location: response.location == null
-        ? null
-        : Location(
-            latitude: response.location.latitude,
-            longitude: response.location.longitude,
-          ),
-    isCompleted: response.is_completed,
-    isActive: response.is_active ?? true,
-    role: response.role.parseToRole(),
-    theatre: response.theatre == null
-        ? null
-        : theatreResponseToTheatre(response.theatre),
-  );
-}
-
-Movie movieRemoteToDomain(MovieResponse response) {
+Movie movieResponseToMovie(MovieResponse res) {
   return Movie(
-    id: response.id,
-    isActive: response.isActive,
-    title: response.title,
-    trailerVideoUrl: response.trailerVideoUrl,
-    posterUrl: response.posterUrl,
-    overview: response.overview,
-    releasedDate: response.releasedDate,
-    duration: response.duration,
-    originalLanguage: response.originalLanguage,
-    createdAt: response.createdAt,
-    updatedAt: response.updatedAt,
-    ageType: response.ageType.ageType(),
-    actors: response.actors.map((e) => personResponseToPerson(e)).toList(),
-    directors:
-        response.directors.map((e) => personResponseToPerson(e)).toList(),
-    categories:
-        response.categories.map((e) => categoryResponseToCategory(e)).toList(),
-    rateStar: response.rateStar,
-    totalFavorite: response.totalFavorite,
-    totalRate: response.totalRate,
+    (b) => b
+      ..id = res.id
+      ..isActive = res.is_active ?? true
+      ..actorIds = (b.actorIds..safeReplace(res.actors))
+      ..directorIds = (b.directorIds..safeReplace(res.directors))
+      ..title = res.title
+      ..trailerVideoUrl = res.trailer_video_url
+      ..posterUrl = res.poster_url
+      ..overview = res.overview
+      ..releasedDate = res.released_date
+      ..duration = res.duration
+      ..originalLanguage = res.original_language
+      ..createdAt = res.createdAt
+      ..updatedAt = res.updatedAt
+      ..ageType = stringToAgeType(res.age_type)
+      ..rateStar = res.rate_star
+      ..totalRate = res.total_rate
+      ..totalFavorite = res.total_favorite,
   );
 }
 
-MovieRequest movieDomainToRemote(Movie movie) {
-  return MovieRequest(
-    title: movie.title,
-    trailerVideoUrl: movie.trailerVideoUrl,
-    posterUrl: movie.posterUrl,
-    overview: movie.overview,
-    releasedDate: movie.releasedDate.toIso8601String(),
-    duration: movie.duration,
-    directorIds: movie.directors.map((e) => e.id).toList(),
-    actorIds: movie.actors.map((e) => e.id).toList(),
-    originalLanguage: movie.originalLanguage,
-    ageType: movie.ageType.toString().split('.')[1],
-    categoryIds: movie.categories.map((e) => e.id).toList(),
+AgeType stringToAgeType(String s) {
+  return AgeType.values.firstWhere(
+    (v) => describeEnum(v) == s,
+    orElse: () => throw Exception("Cannot convert string '$s' to AgeType"),
   );
 }
 
-Category categoryResponseToCategory(CategoryResponse response) {
-  return Category(
-    id: response.id,
-    name: response.name,
-    createdAt: response.createdAt,
-    updatedAt: response.updatedAt,
-    is_active: true,
+Location locationResponseToLocation(LocationResponse response) {
+  return Location((b) => b
+    ..longitude = response.longitude
+    ..latitude = response.latitude);
+}
+
+Theatre theatreResponseToTheatre(TheatreResponse response) {
+  return Theatre((b) {
+    final locationBuilder = b.location
+      ..replace(locationResponseToLocation(response.location));
+    final roomsBuilder = b.rooms..safeReplace(response.rooms);
+
+    b
+      ..id = response.id
+      ..location = locationBuilder
+      ..is_active = response.is_active ?? true
+      ..rooms = roomsBuilder
+      ..name = response.name
+      ..address = response.address
+      ..phone_number = response.phone_number
+      ..description = response.description
+      ..email = response.email
+      ..opening_hours = response.opening_hours
+      ..room_summary = response.room_summary
+      ..createdAt = response.createdAt
+      ..updatedAt = response.updatedAt
+      ..distance = response.distance
+      ..thumbnail = response.thumbnail ?? ''
+      ..cover = response.cover ?? '';
+  });
+}
+
+ShowTime showTimeResponseToShowTime(ShowTimeResponse response) {
+  return ShowTime((b) => b
+    ..id = response.id
+    ..is_active = response.is_active ?? true
+    ..movieId = response.movie
+    ..theatreId = response.theatre
+    ..room = response.room
+    ..end_time = response.end_time
+    ..start_time = response.start_time
+    ..createdAt = response.createdAt
+    ..updatedAt = response.updatedAt);
+}
+
+BuiltMap<DateTime, BuiltList<TheatreAndShowTimes>>
+    showTimeAndTheatreResponsesToTheatreAndShowTimes(
+  BuiltList<ShowTimeAndTheatreResponse> responses,
+) {
+  final _showTimeAndTheatreResponseToTuple2 =
+      (ShowTimeAndTheatreResponse response) => Tuple2(
+            theatreResponseToTheatre(response.theatre),
+            showTimeResponseToShowTime(response.show_time),
+          );
+
+  final _tuplesToMapEntry = (
+    DateTime day,
+    List<Tuple2<Theatre, ShowTime>> tuples,
+  ) {
+    final theatreAndShowTimes = tuples
+        .groupBy(
+          (tuple) => tuple.item1,
+          (tuple) => tuple.item2,
+        )
+        .entries
+        .map(
+          (entry) => TheatreAndShowTimes(
+            (b) {
+              final showTimesBuilder = b.showTimes
+                ..addAll(entry.value)
+                ..sort((l, r) => l.start_time.compareTo(r.start_time));
+
+              final theatreBuilder = b.theatre..replace(entry.key);
+
+              b
+                ..theatre = theatreBuilder
+                ..showTimes = showTimesBuilder;
+            },
+          ),
+        )
+        .toBuiltList();
+    return MapEntry(day, theatreAndShowTimes);
+  };
+
+  final showTimesByDate = responses
+      .map(_showTimeAndTheatreResponseToTuple2)
+      .groupListsBy((tuple) => startOfDay(tuple.item2.start_time))
+      .map(_tuplesToMapEntry);
+
+  return showTimesByDate.build();
+}
+
+Comments commentsResponseToComments(CommentsResponse response) {
+  return Comments((b) {
+    final listBuilder = b.comments
+      ..update(
+        (cb) => cb.addAll(
+          response.comments.map(commentResponseToComment),
+        ),
+      );
+
+    b
+      ..total = response.total
+      ..average = response.average
+      ..comments = listBuilder;
+  });
+}
+
+Comment commentResponseToComment(CommentResponse response) {
+  return Comment((b) {
+    final userBuilder = b.user..replace(userResponseToUser(response.user));
+
+    b
+      ..id = response.id
+      ..is_active = response.is_active ?? true
+      ..content = response.content
+      ..rate_star = response.rate_star
+      ..movie = response.movie
+      ..user = userBuilder
+      ..createdAt = response.createdAt
+      ..updatedAt = response.updatedAt;
+  });
+}
+
+User userResponseToUser(UserResponse response) {
+  return User((b) {
+    final location = response.location;
+    final locationBuilder = location != null &&
+            location.latitude != null &&
+            location.longitude != null
+        ? (b.location..replace(locationResponseToLocation(location)))
+        : null;
+
+    b
+      ..uid = response.uid
+      ..email = response.email
+      ..phoneNumber = response.phoneNumber
+      ..fullName = response.fullName
+      ..gender = stringToGender(response.gender)
+      ..avatar = response.avatar
+      ..address = response.address
+      ..birthday = response.birthday
+      ..location = locationBuilder
+      ..isCompleted = response.isCompleted
+      ..isActive = response.isActive ?? true;
+  });
+}
+
+Movie movieDetailResponseToMovie(MovieDetailResponse res) {
+  return Movie(
+    (b) {
+      final actorIdsBuilder = b.actorIds
+        ..safeReplace(res.actors.map((a) => a.id));
+      final directorIdsBuilder = b.directorIds
+        ..safeReplace(res.directors.map((a) => a.id));
+
+      final actorsBuilder = b.actors
+        ..safeReplace(res.actors.map(personResponseToPerson));
+      final directorsBuilder = b.directors
+        ..safeReplace(res.directors.map(personResponseToPerson));
+      final categoriesBuilder = b.categories
+        ..safeReplace(res.categories.map(categoryResponseToCategory));
+
+      b
+        ..id = res.id
+        ..isActive = res.is_active ?? true
+        ..actorIds = actorIdsBuilder
+        ..directorIds = directorIdsBuilder
+        ..title = res.title
+        ..trailerVideoUrl = res.trailer_video_url
+        ..posterUrl = res.poster_url
+        ..overview = res.overview
+        ..releasedDate = res.released_date
+        ..duration = res.duration
+        ..originalLanguage = res.original_language
+        ..createdAt = res.createdAt
+        ..updatedAt = res.updatedAt
+        ..ageType = stringToAgeType(res.age_type)
+        ..actors = actorsBuilder
+        ..directors = directorsBuilder
+        ..categories = categoriesBuilder
+        ..rateStar = res.rate_star
+        ..totalRate = res.total_rate
+        ..totalFavorite = res.total_favorite;
+    },
   );
 }
 
 Person personResponseToPerson(PersonResponse response) {
   return Person(
-    is_active: response.isActive ?? true,
-    id: response.id,
-    avatar: response.avatar,
-    full_name: response.fullName,
-    createdAt: response.createdAt,
-    updatedAt: response.updatedAt,
+    (b) => b
+      ..is_active = response.is_active ?? true
+      ..id = response.id
+      ..avatar = response.avatar
+      ..full_name = response.full_name
+      ..createdAt = response.createdAt
+      ..updatedAt = response.updatedAt,
   );
 }
 
-extension AgeTypeExtension on String {
-  AgeType ageType() => this == 'P'
-      ? AgeType.P
-      : this == 'C13'
-          ? AgeType.C13
-          : this == 'C16'
-              ? AgeType.C16
-              : AgeType.C18;
-}
-
-Location locationResponseToLocation(LocationResponse response) {
-  return Location(
-    latitude: response.latitude,
-    longitude: response.longitude,
-  );
-}
-
-Theatre theatreResponseToTheatre(TheatreResponse response) {
-  return Theatre(
-    id: response.id,
-    location: locationResponseToLocation(response.location),
-    isActive: response.isActive ?? true,
-    rooms: response.rooms,
-    name: response.name,
-    address: response.address,
-    phoneNumber: response.phoneNumber,
-    description: response.description,
-    email: response.email,
-    openingHours: response.openingHours,
-    roomSummary: response.roomSummary,
-    createdAt: response.createdAt,
-    updatedAt: response.updatedAt,
-    thumbnail: response.thumbnail ?? '',
-    cover: response.cover ?? '',
-  );
-}
-
-ShowTime showTimeResponseToShowTime(ShowTimeResponse r) {
-  final m = r.movie;
-  return ShowTime(
-    isActive: r.isActive ?? true,
-    id: r.id,
-    movie: Movie(
-      id: m.id,
-      isActive: m.isActive ?? true,
-      title: m.title,
-      trailerVideoUrl: m.trailerVideoUrl,
-      posterUrl: m.posterUrl,
-      overview: m.overview,
-      releasedDate: m.releasedDate,
-      duration: m.duration,
-      originalLanguage: m.originalLanguage,
-      createdAt: m.createdAt,
-      updatedAt: m.updatedAt,
-      ageType: m.ageType.ageType(),
-      actors: null,
-      directors: null,
-      categories: null,
-      rateStar: m.rateStar,
-      totalFavorite: m.totalFavorite,
-      totalRate: m.totalRate,
-    ),
-    movieId: m.id,
-    theatreId: r.theatre,
-    room: r.room,
-    endTime: r.endTime,
-    startTime: r.startTime,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-    theatre: null,
+Category categoryResponseToCategory(CategoryResponse response) {
+  return Category(
+    (b) => b
+      ..id = response.id
+      ..name = response.name
+      ..createdAt = response.createdAt
+      ..updatedAt = response.updatedAt
+      ..is_active = response.is_active ?? true,
   );
 }
 
@@ -299,71 +384,43 @@ Product productResponseToProduct(ProductResponse response) {
   );
 }
 
-ShowTime showTimeFullResponseToShowTime(ShowTimeFullResponse r) {
-  final movie = res_movieResponseToMovie(r.movie);
-  final theatre = res_theatreResponseToTheatre(r.theatre);
-
-  return ShowTime(
-    isActive: r.is_active ?? true,
-    id: r.id,
-    movie: movie,
-    movieId: r.movie.id,
-    theatreId: r.theatre.id,
-    room: r.room,
-    endTime: r.end_time,
-    startTime: r.start_time,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-    theatre: theatre,
+Card cardResponseToCard(CardResponse response) {
+  return Card(
+    (b) => b
+      ..brand = response.brand
+      ..card_holder_name = response.card_holder_name
+      ..country = response.country
+      ..exp_month = response.exp_month
+      ..exp_year = response.exp_year
+      ..funding = response.funding
+      ..id = response.id
+      ..last4 = response.last4,
   );
 }
 
-Theatre res_theatreResponseToTheatre(Res_TheatreResponse r) {
-  assert(r.location != null);
+Reservation reservationResponseToReservation(ReservationResponse response) {
+  return Reservation((b) {
+    final productIds = response.products.map((p) =>
+        ProductAndQuantity.from(id: p.id, quantity: p.quantity, product: null));
+    final productIdWithCountsBuilder = b.productIdWithCounts
+      ..safeReplace(productIds);
+    final user = userResponseToUser(response.user);
+    final userBuilder = b.user..replace(user);
 
-  return Theatre(
-    location: Location(
-      latitude: r.location.latitude,
-      longitude: r.location.longitude,
-    ),
-    isActive: r.is_active ?? true,
-    rooms: r.rooms.asList(),
-    id: r.id,
-    name: r.name,
-    address: r.address,
-    phoneNumber: r.phone_number,
-    description: r.description,
-    email: r.email,
-    openingHours: r.opening_hours,
-    roomSummary: r.room_summary,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-    cover: r.cover,
-    thumbnail: r.thumbnail,
-  );
-}
-
-Movie res_movieResponseToMovie(Res_MovieResponse r) {
-  return Movie(
-    id: r.id,
-    isActive: r.is_active ?? true,
-    title: r.title,
-    trailerVideoUrl: r.trailer_video_url,
-    posterUrl: r.poster_url,
-    overview: r.overview,
-    releasedDate: r.released_date,
-    duration: r.duration,
-    originalLanguage: r.original_language,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-    ageType: r.age_type.ageType(),
-    actors: null,
-    directors: null,
-    categories: null,
-    rateStar: r.rate_star,
-    totalFavorite: r.total_favorite,
-    totalRate: r.total_rate,
-  );
+    b
+      ..id = response.id
+      ..createdAt = response.createdAt
+      ..email = response.email
+      ..isActive = response.is_active ?? true
+      ..originalPrice = response.original_price
+      ..paymentIntentId = response.payment_intent_id
+      ..phoneNumber = response.phone_number
+      ..productIdWithCounts = productIdWithCountsBuilder
+      ..showTimeId = response.show_time.id
+      ..totalPrice = response.total_price
+      ..updatedAt = response.updatedAt
+      ..user = userBuilder;
+  });
 }
 
 Promotion promotionResponseToPromotion(PromotionResponse response) {
@@ -383,6 +440,74 @@ Promotion promotionResponseToPromotion(PromotionResponse response) {
   );
 }
 
+Notification notificationResponseToNotification(NotificationResponse res) {
+  return Notification(
+    (b) {
+      final reservationBuilder = b.reservation
+        ..replace(notificationResponse_ReservationResponseToReservation(
+            res.reservation));
+
+      b
+        ..id = res.id
+        ..title = res.title
+        ..body = res.body
+        ..to_user = res.to_user
+        ..createdAt = res.createdAt
+        ..updatedAt = res.updatedAt
+        ..reservation = reservationBuilder;
+    },
+  );
+}
+
+ShowTime showTimeFullResponseToShowTime(ShowTimeFullResponse response) {
+  final movie = movieResponseToMovie(response.movie);
+  final theatre = theatreResponseToTheatre(response.theatre);
+
+  return ShowTime((b) {
+    final movieBuilder = b.movie..replace(movie);
+    final theatreBuilder = b.theatre..replace(theatre);
+
+    b
+      ..id = response.id
+      ..is_active = response.is_active ?? true
+      ..movieId = movie.id
+      ..theatreId = theatre.id
+      ..room = response.room
+      ..end_time = response.end_time
+      ..start_time = response.start_time
+      ..createdAt = response.createdAt
+      ..updatedAt = response.updatedAt
+      ..movie = movieBuilder
+      ..theatre = theatreBuilder;
+  });
+}
+
+Reservation notificationResponse_ReservationResponseToReservation(
+    NotificationResponse_ReservationResponse response) {
+  return Reservation((b) {
+    final productIds = response.products.map((p) =>
+        ProductAndQuantity.from(id: p.id, quantity: p.quantity, product: null));
+    final productIdWithCountsBuilder = b.productIdWithCounts
+      ..safeReplace(productIds);
+    final showTimeBuilder = b.showTime
+      ..replace(showTimeFullResponseToShowTime(response.show_time));
+
+    b
+      ..id = response.id
+      ..createdAt = response.createdAt
+      ..email = response.email
+      ..isActive = response.is_active ?? true
+      ..originalPrice = response.original_price
+      ..paymentIntentId = response.payment_intent_id
+      ..phoneNumber = response.phone_number
+      ..productIdWithCounts = productIdWithCountsBuilder
+      ..showTimeId = response.show_time.id
+      ..showTime = showTimeBuilder
+      ..totalPrice = response.total_price
+      ..updatedAt = response.updatedAt;
+  });
+}
+
 Reservation fullReservationResponseToReservation(
     FullReservationResponse response) {
   return Reservation((b) {
@@ -395,6 +520,8 @@ Reservation fullReservationResponseToReservation(
     );
     final productIdWithCountsBuilder = b.productIdWithCounts
       ..safeReplace(productIds);
+    final showTimeBuilder = b.showTime
+      ..replace(showTimeFullResponseToShowTime(response.show_time));
     final ticketsBuilder = b.tickets
       ..safeReplace(response.tickets.map((t) => ticketResponseToTicket(t)));
 
@@ -403,7 +530,7 @@ Reservation fullReservationResponseToReservation(
         ? null
         : (b.promotion..replace(promotionResponseToPromotion(promotion)));
 
-    return b
+    b
       ..id = response.id
       ..createdAt = response.createdAt
       ..email = response.email
@@ -413,12 +540,51 @@ Reservation fullReservationResponseToReservation(
       ..phoneNumber = response.phone_number
       ..productIdWithCounts = productIdWithCountsBuilder
       ..showTimeId = response.show_time.id
-      ..showTime = showTimeFullResponseToShowTime(response.show_time)
+      ..showTime = showTimeBuilder
       ..totalPrice = response.total_price
       ..updatedAt = response.updatedAt
       ..tickets = ticketsBuilder
       ..promotionId = promotion?.id
-      ..promotion = promotionBuilder
-      ..user = userResponseToUserDomain(response.user);
+      ..promotion = promotionBuilder;
   });
+}
+
+BuiltMap<DateTime, BuiltList<MovieAndShowTimes>>
+    movieAndShowTimeResponsesToMovieAndShowTimes(
+        BuiltList<MovieAndShowTimeResponse> res) {
+  MapEntry<DateTime, BuiltList<MovieAndShowTimes>> toMovieAndShowTimes(
+    DateTime day,
+    List<MovieAndShowTimeResponse> response,
+  ) {
+    final movieAndShowTimeResponses = response
+        .groupListsBy((v) => v.movie)
+        .entries
+        .map(
+          (entry) => MovieAndShowTimes(
+            (b) {
+              final movieAndShowTimeResponses = entry.value;
+
+              final showTimesBuilder = b.showTimes
+                ..addAll(movieAndShowTimeResponses
+                    .map((e) => showTimeResponseToShowTime(e.show_time)))
+                ..sort((l, r) => l.start_time.compareTo(r.start_time));
+
+              final movieBuilder = b.movie
+                ..replace(movieResponseToMovie(
+                    movieAndShowTimeResponses.first.movie));
+
+              b
+                ..movie = movieBuilder
+                ..showTimes = showTimesBuilder;
+            },
+          ),
+        )
+        .toBuiltList();
+    return MapEntry(day, movieAndShowTimeResponses);
+  }
+
+  return res
+      .groupListsBy((v) => startOfDay(v.show_time.start_time))
+      .map(toMovieAndShowTimes)
+      .build();
 }

@@ -1,209 +1,329 @@
-import 'dart:io';
-
-import 'package:built_collection/src/list.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart' as uuid;
+import 'package:built_collection/built_collection.dart';
+import 'package:flutter/foundation.dart' hide Category;
+import 'package:rxdart/rxdart.dart';
 
 import '../../domain/model/category.dart';
-import '../../domain/model/exception.dart';
+import '../../domain/model/location.dart';
 import '../../domain/model/movie.dart';
-import '../../domain/model/person.dart';
+import '../../domain/model/movie_and_showtimes.dart';
+import '../../domain/model/theatre_and_show_times.dart';
 import '../../domain/repository/movie_repository.dart';
-import '../mappers.dart';
+import '../../utils/utils.dart';
+import '../local/search_keyword_source.dart';
 import '../remote/auth_client.dart';
 import '../remote/base_url.dart';
 import '../remote/response/category_response.dart';
-import '../remote/response/error_response.dart';
+import '../remote/response/movie_and_show_time_response.dart';
+import '../remote/response/movie_detail_response.dart';
 import '../remote/response/movie_response.dart';
-import '../remote/response/person_response.dart';
+import '../remote/response/show_time_and_theatre_response.dart';
+import '../serializers.dart';
+
+// TODO: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison
 
 class MovieRepositoryImpl implements MovieRepository {
-  final AuthClient _authClient;
+  final AuthHttpClient _authClient;
 
-  MovieRepositoryImpl(this._authClient);
+  final Function1<MovieResponse, Movie> _movieResponseToMovie;
+  final Function1<BuiltList<ShowTimeAndTheatreResponse>,
+          BuiltMap<DateTime, BuiltList<TheatreAndShowTimes>>>
+      _showTimeAndTheatreResponsesToTheatreAndShowTimes;
+  final Function1<MovieDetailResponse, Movie> _movieDetailResponseToMovie;
 
-  @override
-  Future<List<Movie>> getListMovie(int page, int perPage) async {
-    try {
-      final usersRes = await _authClient.getBody(buildUrl(
-          'admin_movies/', {'page': '$page', 'per_page': '$perPage'})) as List;
-      return usersRes
-          .map((json) => movieRemoteToDomain(MovieResponse.fromJson(json)))
-          .toList();
-    } on ErrorResponse catch (e) {
-      if (e.statusCode == HttpStatus.notFound) {
-        throw const NotCompletedManagerUserException();
-      }
-      rethrow;
-    }
-  }
+  final Function1<BuiltList<MovieAndShowTimeResponse>,
+          BuiltMap<DateTime, BuiltList<MovieAndShowTimes>>>
+      _movieAndShowTimeResponsesToMovieAndShowTimes;
 
-  @override
-  Future<void> uploadMovie(Movie movie) async {
-    try {
-      final movieRes = await _authClient.postBody(
-        buildUrl('admin_movies/'),
-        body: movieDomainToRemote(movie).toJson(),
-      );
-      print(movieRes);
-    } on ErrorResponse catch (e) {
-      if (e.statusCode == HttpStatus.notFound) {
-        throw const NotCompletedManagerUserException();
-      }
-      rethrow;
-    }
-  }
+  final Function1<CategoryResponse, Category> _categoryResponseToCategory;
 
-  @override
-  Future<List<Person>> getListSearchPerson(String name) async {
-    try {
-      final res = await _authClient
-          .getBody(buildUrl('people/search/', {'name': name})) as List;
-      return res
-          .map((e) => PersonResponse.fromJson(e))
-          .map((e) => personResponseToPerson(e))
-          .toList();
-    } on ErrorResponse catch (e) {
-      if (e.statusCode == HttpStatus.notFound) {
-        throw const NotCompletedManagerUserException();
-      }
-      rethrow;
-    }
-  }
+  final SearchKeywordSource _searchKeywordSource;
 
-  @override
-  Future<List<Category>> getListCategory() async {
-    try {
-      final res = await _authClient.getBody(buildUrl('categories/')) as List;
-      return res
-          .map((e) => CategoryResponse.fromJson(e))
-          .map((e) => categoryResponseToCategory(e))
-          .toList();
-    } on ErrorResponse catch (e) {
-      if (e.statusCode == HttpStatus.notFound) {
-        throw const NotCompletedManagerUserException();
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<String> uploadUrl(String path, [bool isVideo]) async {
-    try {
-      final task = FirebaseStorage.instance
-          .ref()
-          .child('movies')
-          .child(uuid.Uuid().v4())
-          .putFile(
-            File(path),
-            identical(isVideo, true)
-                ? SettableMetadata(
-                    contentType: 'video/mp4',
-                  )
-                : null,
-          );
-      await task;
-      return await task.snapshot.ref.getDownloadURL();
-    } on PlatformException catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<BuiltList<Movie>> search(String title) async {
-    final usersRes = await _authClient.getBody(
-      buildUrl(
-        '/admin_movies/search',
-        {'title': title},
-      ),
-    ) as List;
-    return usersRes
-        .map((json) => SearchMovieRes.fromJson(json))
-        .map(searchMovieResToDomain)
-        .toBuiltList();
-  }
-}
-
-Movie searchMovieResToDomain(SearchMovieRes r) {
-  return Movie(
-    id: r.id,
-    isActive: r.isActive ?? true,
-    title: r.title,
-    trailerVideoUrl: r.trailerVideoUrl,
-    posterUrl: r.posterUrl,
-    overview: r.overview,
-    releasedDate: DateTime.parse(r.releasedDate).toLocal(),
-    duration: r.duration,
-    originalLanguage: r.originalLanguage,
-    createdAt: DateTime.parse(r.createdAt).toLocal(),
-    updatedAt: DateTime.parse(r.updatedAt).toLocal(),
-    ageType: r.ageType.ageType(),
-    actors: null,
-    directors: null,
-    categories: null,
-    rateStar: r.rateStar,
-    totalFavorite: r.totalFavorite,
-    totalRate: r.totalRate,
+  MovieRepositoryImpl(
+    this._authClient,
+    this._movieResponseToMovie,
+    this._showTimeAndTheatreResponsesToTheatreAndShowTimes,
+    this._movieDetailResponseToMovie,
+    this._movieAndShowTimeResponsesToMovieAndShowTimes,
+    this._searchKeywordSource,
+    this._categoryResponseToCategory,
   );
-}
 
-class SearchMovieRes {
-  bool isActive;
-  String ageType;
-  List<String> actors;
-  List<String> directors;
-  String title;
-  String trailerVideoUrl;
-  String posterUrl;
-  String overview;
-  String releasedDate;
-  int duration;
-  String originalLanguage;
-  String createdAt;
-  String updatedAt;
-  double rateStar;
-  int totalFavorite;
-  int totalRate;
-  String id;
+  @override
+  Stream<BuiltList<Movie>> getNowPlayingMovies({
+    required Location? location,
+    required int page,
+    required int perPage,
+  }) async* {
+    ArgumentError.checkNotNull(page, 'page');
+    ArgumentError.checkNotNull(perPage, 'perPage');
 
-  SearchMovieRes(
-      {this.isActive,
-      this.ageType,
-      this.actors,
-      this.directors,
-      this.title,
-      this.trailerVideoUrl,
-      this.posterUrl,
-      this.overview,
-      this.releasedDate,
-      this.duration,
-      this.originalLanguage,
-      this.createdAt,
-      this.updatedAt,
-      this.rateStar,
-      this.totalFavorite,
-      this.totalRate,
-      this.id});
+    final json = await _authClient.getJson(
+      buildUrl(
+        '/movies/now-playing',
+        {
+          'page': page.toString(),
+          'per_page': perPage.toString(),
+          if (location != null) ...{
+            'lat': location.latitude.toString(),
+            'lng': location.longitude.toString(),
+          },
+        },
+      ),
+    );
 
-  SearchMovieRes.fromJson(Map<String, dynamic> json) {
-    isActive = json['is_active'];
-    ageType = json['age_type'];
-    actors = json['actors'].cast<String>();
-    directors = json['directors'].cast<String>();
-    id = json['_id'];
-    title = json['title'];
-    trailerVideoUrl = json['trailer_video_url'];
-    posterUrl = json['poster_url'];
-    overview = json['overview'];
-    releasedDate = json['released_date'];
-    duration = json['duration'];
-    originalLanguage = json['original_language'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
-    rateStar = (json['rate_star'] as num).toDouble();
-    totalFavorite = json['total_favorite'];
-    totalRate = json['total_rate'];
+    final response = serializers.deserialize(
+      json,
+      specifiedType: builtListMovieResponse,
+    ) as BuiltList<MovieResponse>;
+
+    yield response.map(_movieResponseToMovie).toBuiltList();
+  }
+
+  @override
+  Stream<BuiltList<Movie>> getComingSoonMovies({
+    required int page,
+    required int perPage,
+  }) async* {
+    ArgumentError.checkNotNull(page, 'page');
+    ArgumentError.checkNotNull(perPage, 'perPage');
+
+    final json = await _authClient.getJson(
+      buildUrl(
+        '/movies/coming-soon',
+        {
+          'page': page.toString(),
+          'per_page': perPage.toString(),
+        },
+      ),
+    );
+
+    final response = serializers.deserialize(
+      json,
+      specifiedType: builtListMovieResponse,
+    ) as BuiltList<MovieResponse>;
+
+    yield response.map(_movieResponseToMovie).toBuiltList();
+  }
+
+  @override
+  Stream<BuiltMap<DateTime, BuiltList<TheatreAndShowTimes>>> getShowTimes({
+    required String movieId,
+    required Location? location,
+  }) async* {
+    ArgumentError.checkNotNull(movieId, 'movieId');
+
+    final json = await _authClient.getJson(
+      buildUrl(
+        '/show-times/movies/$movieId',
+        location != null
+            ? {
+                'lat': location.latitude.toString(),
+                'lng': location.longitude.toString(),
+              }
+            : null,
+      ),
+    );
+
+    final response = serializers.deserialize(
+      json,
+      specifiedType: builtListShowTimeAndTheatreResponse,
+    ) as BuiltList<ShowTimeAndTheatreResponse>;
+
+    yield _showTimeAndTheatreResponsesToTheatreAndShowTimes(response);
+  }
+
+  @override
+  Stream<Movie> getMovieDetail(String movieId) async* {
+    ArgumentError.checkNotNull(movieId, 'movieId');
+
+    final json = await _authClient.getJson(buildUrl('/movies/$movieId'));
+    yield _movieDetailResponseToMovie(MovieDetailResponse.fromJson(json));
+  }
+
+  @override
+  Stream<BuiltList<Movie>> getRecommendedMovies(Location? location) =>
+      Rx.fromCallable(() => _authClient
+          .getJson(
+            buildUrl(
+              '/neo4j',
+              location != null
+                  ? {
+                      'lat': location.latitude.toString(),
+                      'lng': location.longitude.toString(),
+                    }
+                  : null,
+            ),
+          )
+          .then(mapResult));
+
+  @override
+  Stream<BuiltList<Movie>> getMostFavorite({
+    required int page,
+    required int perPage,
+  }) {
+    if (page == null) return Stream.error(ArgumentError.notNull('page'));
+    if (perPage == null) return Stream.error(ArgumentError.notNull('perPage'));
+
+    return Rx.fromCallable(() => _authClient
+        .getJson(
+          buildUrl(
+            '/movies/most-favorite',
+            {
+              'page': page.toString(),
+              'per_page': perPage.toString(),
+            },
+          ),
+        )
+        .then(mapResult));
+  }
+
+  @override
+  Stream<BuiltList<Movie>> getMostRate({
+    required int page,
+    required int perPage,
+  }) {
+    if (page == null) return Stream.error(ArgumentError.notNull('page'));
+    if (perPage == null) return Stream.error(ArgumentError.notNull('perPage'));
+
+    return Rx.fromCallable(() => _authClient
+        .getJson(
+          buildUrl(
+            '/movies/most-rate',
+            {
+              'page': page.toString(),
+              'per_page': perPage.toString(),
+            },
+          ),
+        )
+        .then(mapResult));
+  }
+
+  BuiltList<Movie> mapResult(dynamic json) {
+    final response = serializers.deserialize(
+      json,
+      specifiedType: builtListMovieResponse,
+    ) as BuiltList<MovieResponse>;
+
+    return response.map(_movieResponseToMovie).toBuiltList();
+  }
+
+  @override
+  Stream<BuiltMap<DateTime, BuiltList<MovieAndShowTimes>>>
+      getShowTimesByTheatreId(String theatreId) {
+    if (theatreId == null) {
+      return Stream.error(ArgumentError.notNull('theatreId'));
+    }
+
+    final mapResult = (Object? json) {
+      final response = serializers.deserialize(
+        json,
+        specifiedType: builtListMovieAndShowTimeResponse,
+      ) as BuiltList<MovieAndShowTimeResponse>;
+      return _movieAndShowTimeResponsesToMovieAndShowTimes(response);
+    };
+
+    return Rx.fromCallable(() => _authClient
+        .getJson(buildUrl('/show-times/theatres/$theatreId'))
+        .then(mapResult));
+  }
+
+  @override
+  Stream<BuiltList<Movie>> search({
+    required String query,
+    required DateTime showtimeStartTime,
+    required DateTime showtimeEndTime,
+    required DateTime minReleasedDate,
+    required DateTime maxReleasedDate,
+    required int minDuration,
+    required int maxDuration,
+    required AgeType ageType,
+    required Location? location,
+    required BuiltSet<String> selectedCategoryIds,
+  }) {
+    if (query == null) {
+      return Stream.error(ArgumentError.notNull('query'));
+    }
+    if (showtimeStartTime == null) {
+      return Stream.error(ArgumentError.notNull('showtimeStartTime'));
+    }
+    if (showtimeEndTime == null) {
+      return Stream.error(ArgumentError.notNull('showtimeEndTime'));
+    }
+    if (minReleasedDate == null) {
+      return Stream.error(ArgumentError.notNull('minReleasedDate'));
+    }
+    if (maxReleasedDate == null) {
+      return Stream.error(ArgumentError.notNull('maxReleasedDate'));
+    }
+    if (minDuration == null) {
+      return Stream.error(ArgumentError.notNull('minDuration'));
+    }
+    if (maxReleasedDate == null) {
+      return Stream.error(ArgumentError.notNull('maxReleasedDate'));
+    }
+    if (maxReleasedDate == null) {
+      return Stream.error(ArgumentError.notNull('maxReleasedDate'));
+    }
+    if (selectedCategoryIds == null) {
+      return Stream.error(ArgumentError.notNull('selectedCategoryIds'));
+    }
+
+    return Rx.fromCallable(() => _authClient
+        .getJson(
+          buildUrl(
+            '/neo4j/search-movies',
+            {
+              'query': query,
+              'search_start_time': showtimeStartTime.toUtc().toIso8601String(),
+              'search_end_time': showtimeEndTime.toUtc().toIso8601String(),
+              'min_released_date': minReleasedDate.toUtc().toIso8601String(),
+              'max_released_date': maxReleasedDate.toUtc().toIso8601String(),
+              'min_duration': minDuration.toString(),
+              'max_duration': maxDuration.toString(),
+              'age_type': describeEnum(ageType),
+              if (selectedCategoryIds.isNotEmpty)
+                'category_ids': selectedCategoryIds.join(','),
+              if (location != null) ...{
+                'lat': location.latitude.toString(),
+                'lng': location.longitude.toString(),
+              },
+            },
+          ),
+        )
+        .then(mapResult));
+  }
+
+  @override
+  Future<void> saveSearchQuery(String query) =>
+      _searchKeywordSource.saveSearchQuery(query);
+
+  @override
+  Future<BuiltList<String>> getQueries() => _searchKeywordSource.getQueries();
+
+  @override
+  Stream<BuiltList<Category>> getCategories() {
+    final mapResult = (dynamic json) {
+      final response = serializers.deserialize(
+        json,
+        specifiedType: builtListCategoryResponse,
+      )! as BuiltList<CategoryResponse>;
+
+      return [for (final r in response) _categoryResponseToCategory(r)].build();
+    };
+    return Rx.fromCallable(
+        () => _authClient.getJson(buildUrl('/categories')).then(mapResult));
+  }
+
+  @override
+  Stream<BuiltList<Movie>> getRelatedMovies(String movieId) {
+    if (movieId == null) {
+      return Stream.error(ArgumentError.notNull('movieId'));
+    }
+    return Rx.fromCallable(
+      () => _authClient
+          .getJson(buildUrl('/neo4j/related-movies/$movieId'))
+          .then(mapResult),
+    );
   }
 }

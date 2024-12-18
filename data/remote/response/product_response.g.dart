@@ -17,9 +17,9 @@ class _$ProductResponseSerializer
   final String wireName = 'ProductResponse';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, ProductResponse object,
+  Iterable<Object?> serialize(Serializers serializers, ProductResponse object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       '_id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'description',
@@ -39,18 +39,20 @@ class _$ProductResponseSerializer
       serializers.serialize(object.updatedAt,
           specifiedType: const FullType(DateTime)),
     ];
-    if (object.is_active != null) {
+    Object? value;
+    value = object.is_active;
+    if (value != null) {
       result
         ..add('is_active')
-        ..add(serializers.serialize(object.is_active,
-            specifiedType: const FullType(bool)));
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
     }
     return result;
   }
 
   @override
   ProductResponse deserialize(
-      Serializers serializers, Iterable<Object> serialized,
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new ProductResponseBuilder();
 
@@ -58,7 +60,7 @@ class _$ProductResponseSerializer
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case '_id':
           result.id = serializers.deserialize(value,
@@ -107,7 +109,7 @@ class _$ProductResponse extends ProductResponse {
   @override
   final String image;
   @override
-  final bool is_active;
+  final bool? is_active;
   @override
   final String name;
   @override
@@ -117,40 +119,29 @@ class _$ProductResponse extends ProductResponse {
   @override
   final DateTime updatedAt;
 
-  factory _$ProductResponse([void Function(ProductResponseBuilder) updates]) =>
+  factory _$ProductResponse([void Function(ProductResponseBuilder)? updates]) =>
       (new ProductResponseBuilder()..update(updates)).build();
 
   _$ProductResponse._(
-      {this.id,
-      this.description,
-      this.image,
+      {required this.id,
+      required this.description,
+      required this.image,
       this.is_active,
-      this.name,
-      this.price,
-      this.createdAt,
-      this.updatedAt})
+      required this.name,
+      required this.price,
+      required this.createdAt,
+      required this.updatedAt})
       : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'id');
-    }
-    if (description == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'description');
-    }
-    if (image == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'image');
-    }
-    if (name == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'name');
-    }
-    if (price == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'price');
-    }
-    if (createdAt == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'createdAt');
-    }
-    if (updatedAt == null) {
-      throw new BuiltValueNullFieldError('ProductResponse', 'updatedAt');
-    }
+    BuiltValueNullFieldError.checkNotNull(id, 'ProductResponse', 'id');
+    BuiltValueNullFieldError.checkNotNull(
+        description, 'ProductResponse', 'description');
+    BuiltValueNullFieldError.checkNotNull(image, 'ProductResponse', 'image');
+    BuiltValueNullFieldError.checkNotNull(name, 'ProductResponse', 'name');
+    BuiltValueNullFieldError.checkNotNull(price, 'ProductResponse', 'price');
+    BuiltValueNullFieldError.checkNotNull(
+        createdAt, 'ProductResponse', 'createdAt');
+    BuiltValueNullFieldError.checkNotNull(
+        updatedAt, 'ProductResponse', 'updatedAt');
   }
 
   @override
@@ -208,52 +199,53 @@ class _$ProductResponse extends ProductResponse {
 
 class ProductResponseBuilder
     implements Builder<ProductResponse, ProductResponseBuilder> {
-  _$ProductResponse _$v;
+  _$ProductResponse? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  String _description;
-  String get description => _$this._description;
-  set description(String description) => _$this._description = description;
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
 
-  String _image;
-  String get image => _$this._image;
-  set image(String image) => _$this._image = image;
+  String? _image;
+  String? get image => _$this._image;
+  set image(String? image) => _$this._image = image;
 
-  bool _is_active;
-  bool get is_active => _$this._is_active;
-  set is_active(bool is_active) => _$this._is_active = is_active;
+  bool? _is_active;
+  bool? get is_active => _$this._is_active;
+  set is_active(bool? is_active) => _$this._is_active = is_active;
 
-  String _name;
-  String get name => _$this._name;
-  set name(String name) => _$this._name = name;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
-  int _price;
-  int get price => _$this._price;
-  set price(int price) => _$this._price = price;
+  int? _price;
+  int? get price => _$this._price;
+  set price(int? price) => _$this._price = price;
 
-  DateTime _createdAt;
-  DateTime get createdAt => _$this._createdAt;
-  set createdAt(DateTime createdAt) => _$this._createdAt = createdAt;
+  DateTime? _createdAt;
+  DateTime? get createdAt => _$this._createdAt;
+  set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
-  DateTime _updatedAt;
-  DateTime get updatedAt => _$this._updatedAt;
-  set updatedAt(DateTime updatedAt) => _$this._updatedAt = updatedAt;
+  DateTime? _updatedAt;
+  DateTime? get updatedAt => _$this._updatedAt;
+  set updatedAt(DateTime? updatedAt) => _$this._updatedAt = updatedAt;
 
   ProductResponseBuilder();
 
   ProductResponseBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _description = _$v.description;
-      _image = _$v.image;
-      _is_active = _$v.is_active;
-      _name = _$v.name;
-      _price = _$v.price;
-      _createdAt = _$v.createdAt;
-      _updatedAt = _$v.updatedAt;
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _description = $v.description;
+      _image = $v.image;
+      _is_active = $v.is_active;
+      _name = $v.name;
+      _price = $v.price;
+      _createdAt = $v.createdAt;
+      _updatedAt = $v.updatedAt;
       _$v = null;
     }
     return this;
@@ -261,14 +253,12 @@ class ProductResponseBuilder
 
   @override
   void replace(ProductResponse other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$ProductResponse;
   }
 
   @override
-  void update(void Function(ProductResponseBuilder) updates) {
+  void update(void Function(ProductResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -276,14 +266,21 @@ class ProductResponseBuilder
   _$ProductResponse build() {
     final _$result = _$v ??
         new _$ProductResponse._(
-            id: id,
-            description: description,
-            image: image,
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, 'ProductResponse', 'id'),
+            description: BuiltValueNullFieldError.checkNotNull(
+                description, 'ProductResponse', 'description'),
+            image: BuiltValueNullFieldError.checkNotNull(
+                image, 'ProductResponse', 'image'),
             is_active: is_active,
-            name: name,
-            price: price,
-            createdAt: createdAt,
-            updatedAt: updatedAt);
+            name: BuiltValueNullFieldError.checkNotNull(
+                name, 'ProductResponse', 'name'),
+            price: BuiltValueNullFieldError.checkNotNull(
+                price, 'ProductResponse', 'price'),
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+                createdAt, 'ProductResponse', 'createdAt'),
+            updatedAt: BuiltValueNullFieldError.checkNotNull(
+                updatedAt, 'ProductResponse', 'updatedAt'));
     replace(_$result);
     return _$result;
   }

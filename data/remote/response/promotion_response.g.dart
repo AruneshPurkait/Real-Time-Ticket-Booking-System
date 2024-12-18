@@ -17,9 +17,9 @@ class _$PromotionResponseSerializer
   final String wireName = 'PromotionResponse';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, PromotionResponse object,
+  Iterable<Object?> serialize(Serializers serializers, PromotionResponse object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       '_id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'code',
@@ -30,9 +30,6 @@ class _$PromotionResponseSerializer
       'end_time',
       serializers.serialize(object.end_time,
           specifiedType: const FullType(DateTime)),
-      'is_active',
-      serializers.serialize(object.is_active,
-          specifiedType: const FullType(bool)),
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
       'start_time',
@@ -51,13 +48,20 @@ class _$PromotionResponseSerializer
       serializers.serialize(object.updatedAt,
           specifiedType: const FullType(DateTime)),
     ];
-
+    Object? value;
+    value = object.is_active;
+    if (value != null) {
+      result
+        ..add('is_active')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
     return result;
   }
 
   @override
   PromotionResponse deserialize(
-      Serializers serializers, Iterable<Object> serialized,
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new PromotionResponseBuilder();
 
@@ -65,7 +69,7 @@ class _$PromotionResponseSerializer
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case '_id':
           result.id = serializers.deserialize(value,
@@ -128,7 +132,7 @@ class _$PromotionResponse extends PromotionResponse {
   @override
   final DateTime end_time;
   @override
-  final bool is_active;
+  final bool? is_active;
   @override
   final String name;
   @override
@@ -143,55 +147,39 @@ class _$PromotionResponse extends PromotionResponse {
   final DateTime updatedAt;
 
   factory _$PromotionResponse(
-          [void Function(PromotionResponseBuilder) updates]) =>
+          [void Function(PromotionResponseBuilder)? updates]) =>
       (new PromotionResponseBuilder()..update(updates)).build();
 
   _$PromotionResponse._(
-      {this.id,
-      this.code,
-      this.discount,
-      this.end_time,
+      {required this.id,
+      required this.code,
+      required this.discount,
+      required this.end_time,
       this.is_active,
-      this.name,
-      this.start_time,
-      this.creator,
-      this.show_time,
-      this.createdAt,
-      this.updatedAt})
+      required this.name,
+      required this.start_time,
+      required this.creator,
+      required this.show_time,
+      required this.createdAt,
+      required this.updatedAt})
       : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'id');
-    }
-    if (code == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'code');
-    }
-    if (discount == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'discount');
-    }
-    if (end_time == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'end_time');
-    }
-    if (is_active == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'is_active');
-    }
-    if (name == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'name');
-    }
-    if (start_time == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'start_time');
-    }
-    if (creator == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'creator');
-    }
-    if (show_time == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'show_time');
-    }
-    if (createdAt == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'createdAt');
-    }
-    if (updatedAt == null) {
-      throw new BuiltValueNullFieldError('PromotionResponse', 'updatedAt');
-    }
+    BuiltValueNullFieldError.checkNotNull(id, 'PromotionResponse', 'id');
+    BuiltValueNullFieldError.checkNotNull(code, 'PromotionResponse', 'code');
+    BuiltValueNullFieldError.checkNotNull(
+        discount, 'PromotionResponse', 'discount');
+    BuiltValueNullFieldError.checkNotNull(
+        end_time, 'PromotionResponse', 'end_time');
+    BuiltValueNullFieldError.checkNotNull(name, 'PromotionResponse', 'name');
+    BuiltValueNullFieldError.checkNotNull(
+        start_time, 'PromotionResponse', 'start_time');
+    BuiltValueNullFieldError.checkNotNull(
+        creator, 'PromotionResponse', 'creator');
+    BuiltValueNullFieldError.checkNotNull(
+        show_time, 'PromotionResponse', 'show_time');
+    BuiltValueNullFieldError.checkNotNull(
+        createdAt, 'PromotionResponse', 'createdAt');
+    BuiltValueNullFieldError.checkNotNull(
+        updatedAt, 'PromotionResponse', 'updatedAt');
   }
 
   @override
@@ -261,67 +249,68 @@ class _$PromotionResponse extends PromotionResponse {
 
 class PromotionResponseBuilder
     implements Builder<PromotionResponse, PromotionResponseBuilder> {
-  _$PromotionResponse _$v;
+  _$PromotionResponse? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  String _code;
-  String get code => _$this._code;
-  set code(String code) => _$this._code = code;
+  String? _code;
+  String? get code => _$this._code;
+  set code(String? code) => _$this._code = code;
 
-  double _discount;
-  double get discount => _$this._discount;
-  set discount(double discount) => _$this._discount = discount;
+  double? _discount;
+  double? get discount => _$this._discount;
+  set discount(double? discount) => _$this._discount = discount;
 
-  DateTime _end_time;
-  DateTime get end_time => _$this._end_time;
-  set end_time(DateTime end_time) => _$this._end_time = end_time;
+  DateTime? _end_time;
+  DateTime? get end_time => _$this._end_time;
+  set end_time(DateTime? end_time) => _$this._end_time = end_time;
 
-  bool _is_active;
-  bool get is_active => _$this._is_active;
-  set is_active(bool is_active) => _$this._is_active = is_active;
+  bool? _is_active;
+  bool? get is_active => _$this._is_active;
+  set is_active(bool? is_active) => _$this._is_active = is_active;
 
-  String _name;
-  String get name => _$this._name;
-  set name(String name) => _$this._name = name;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
-  DateTime _start_time;
-  DateTime get start_time => _$this._start_time;
-  set start_time(DateTime start_time) => _$this._start_time = start_time;
+  DateTime? _start_time;
+  DateTime? get start_time => _$this._start_time;
+  set start_time(DateTime? start_time) => _$this._start_time = start_time;
 
-  String _creator;
-  String get creator => _$this._creator;
-  set creator(String creator) => _$this._creator = creator;
+  String? _creator;
+  String? get creator => _$this._creator;
+  set creator(String? creator) => _$this._creator = creator;
 
-  String _show_time;
-  String get show_time => _$this._show_time;
-  set show_time(String show_time) => _$this._show_time = show_time;
+  String? _show_time;
+  String? get show_time => _$this._show_time;
+  set show_time(String? show_time) => _$this._show_time = show_time;
 
-  DateTime _createdAt;
-  DateTime get createdAt => _$this._createdAt;
-  set createdAt(DateTime createdAt) => _$this._createdAt = createdAt;
+  DateTime? _createdAt;
+  DateTime? get createdAt => _$this._createdAt;
+  set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
-  DateTime _updatedAt;
-  DateTime get updatedAt => _$this._updatedAt;
-  set updatedAt(DateTime updatedAt) => _$this._updatedAt = updatedAt;
+  DateTime? _updatedAt;
+  DateTime? get updatedAt => _$this._updatedAt;
+  set updatedAt(DateTime? updatedAt) => _$this._updatedAt = updatedAt;
 
   PromotionResponseBuilder();
 
   PromotionResponseBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _code = _$v.code;
-      _discount = _$v.discount;
-      _end_time = _$v.end_time;
-      _is_active = _$v.is_active;
-      _name = _$v.name;
-      _start_time = _$v.start_time;
-      _creator = _$v.creator;
-      _show_time = _$v.show_time;
-      _createdAt = _$v.createdAt;
-      _updatedAt = _$v.updatedAt;
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _code = $v.code;
+      _discount = $v.discount;
+      _end_time = $v.end_time;
+      _is_active = $v.is_active;
+      _name = $v.name;
+      _start_time = $v.start_time;
+      _creator = $v.creator;
+      _show_time = $v.show_time;
+      _createdAt = $v.createdAt;
+      _updatedAt = $v.updatedAt;
       _$v = null;
     }
     return this;
@@ -329,14 +318,12 @@ class PromotionResponseBuilder
 
   @override
   void replace(PromotionResponse other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$PromotionResponse;
   }
 
   @override
-  void update(void Function(PromotionResponseBuilder) updates) {
+  void update(void Function(PromotionResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -344,17 +331,27 @@ class PromotionResponseBuilder
   _$PromotionResponse build() {
     final _$result = _$v ??
         new _$PromotionResponse._(
-            id: id,
-            code: code,
-            discount: discount,
-            end_time: end_time,
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, 'PromotionResponse', 'id'),
+            code: BuiltValueNullFieldError.checkNotNull(
+                code, 'PromotionResponse', 'code'),
+            discount: BuiltValueNullFieldError.checkNotNull(
+                discount, 'PromotionResponse', 'discount'),
+            end_time: BuiltValueNullFieldError.checkNotNull(
+                end_time, 'PromotionResponse', 'end_time'),
             is_active: is_active,
-            name: name,
-            start_time: start_time,
-            creator: creator,
-            show_time: show_time,
-            createdAt: createdAt,
-            updatedAt: updatedAt);
+            name: BuiltValueNullFieldError.checkNotNull(
+                name, 'PromotionResponse', 'name'),
+            start_time: BuiltValueNullFieldError.checkNotNull(
+                start_time, 'PromotionResponse', 'start_time'),
+            creator: BuiltValueNullFieldError.checkNotNull(
+                creator, 'PromotionResponse', 'creator'),
+            show_time: BuiltValueNullFieldError.checkNotNull(
+                show_time, 'PromotionResponse', 'show_time'),
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+                createdAt, 'PromotionResponse', 'createdAt'),
+            updatedAt: BuiltValueNullFieldError.checkNotNull(
+                updatedAt, 'PromotionResponse', 'updatedAt'));
     replace(_$result);
     return _$result;
   }

@@ -1,99 +1,42 @@
-// ignore_for_file: prefer_single_quotes
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-class ShowTimeResponse {
-  ShowTimeResponse({
-    this.isActive,
-    this.id,
-    this.movie,
-    this.theatre,
-    this.room,
-    this.endTime,
-    this.startTime,
-    this.createdAt,
-    this.updatedAt,
-  });
+import '../../serializers.dart';
 
-  final bool isActive;
-  final String id;
-  final ShowTimeResponse_MovieResponse movie;
-  final String theatre;
-  final String room;
-  final DateTime endTime;
-  final DateTime startTime;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+part 'show_time_response.g.dart';
 
-  factory ShowTimeResponse.fromJson(Map<String, dynamic> json) =>
-      ShowTimeResponse(
-        isActive: json["is_active"],
-        id: json["_id"],
-        movie: ShowTimeResponse_MovieResponse.fromJson(json["movie"]),
-        theatre: json["theatre"],
-        room: json["room"],
-        endTime: DateTime.parse(json["end_time"]).toLocal(),
-        startTime: DateTime.parse(json["start_time"]).toLocal(),
-        createdAt: DateTime.parse(json["createdAt"]).toLocal(),
-        updatedAt: DateTime.parse(json["updatedAt"]).toLocal(),
-      );
-}
+abstract class ShowTimeResponse
+    implements Built<ShowTimeResponse, ShowTimeResponseBuilder> {
+  @BuiltValueField(wireName: '_id')
+  String get id;
 
-class ShowTimeResponse_MovieResponse {
-  ShowTimeResponse_MovieResponse({
-    this.isActive,
-    this.ageType,
-    this.actors,
-    this.directors,
-    this.id,
-    this.rateStar,
-    this.totalRate,
-    this.totalFavorite,
-    this.title,
-    this.trailerVideoUrl,
-    this.posterUrl,
-    this.overview,
-    this.releasedDate,
-    this.duration,
-    this.originalLanguage,
-    this.createdAt,
-    this.updatedAt,
-  });
+  bool? get is_active;
 
-  final bool isActive;
-  final String ageType;
-  final List<String> actors;
-  final List<String> directors;
-  final String id;
-  final double rateStar;
-  final int totalRate;
-  final int totalFavorite;
-  final String title;
-  final String trailerVideoUrl;
-  final String posterUrl;
-  final String overview;
-  final DateTime releasedDate;
-  final int duration;
-  final String originalLanguage;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  String get movie;
 
-  factory ShowTimeResponse_MovieResponse.fromJson(Map<String, dynamic> json) =>
-      ShowTimeResponse_MovieResponse(
-        isActive: json["is_active"],
-        ageType: json["age_type"],
-        actors: List<String>.from(json["actors"].map((x) => x)),
-        directors: List<String>.from(json["directors"].map((x) => x)),
-        id: json["_id"],
-        rateStar: (json["rate_star"] as num).toDouble(),
-        totalRate: json["total_rate"],
-        totalFavorite: json["total_favorite"],
-        title: json["title"],
-        trailerVideoUrl: json["trailer_video_url"],
-        posterUrl: json["poster_url"],
-        overview: json["overview"],
-        releasedDate: DateTime.parse(json["released_date"]).toLocal(),
-        duration: json["duration"],
-        originalLanguage: json["original_language"],
-        createdAt: DateTime.parse(json["createdAt"]).toLocal(),
-        updatedAt: DateTime.parse(json["updatedAt"]).toLocal(),
-      );
+  String get theatre;
+
+  String get room;
+
+  DateTime get end_time;
+
+  DateTime get start_time;
+
+  DateTime get createdAt;
+
+  DateTime get updatedAt;
+
+  ShowTimeResponse._();
+
+  factory ShowTimeResponse([void Function(ShowTimeResponseBuilder) updates]) =
+      _$ShowTimeResponse;
+
+  static Serializer<ShowTimeResponse> get serializer =>
+      _$showTimeResponseSerializer;
+
+  factory ShowTimeResponse.fromJson(Map<String, Object?> json) =>
+      serializers.deserializeWith<ShowTimeResponse>(serializer, json)!;
+
+  Map<String, Object?> toJson() =>
+      serializers.serializeWith(serializer, this) as Map<String, Object?>;
 }

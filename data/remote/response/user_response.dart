@@ -1,93 +1,83 @@
-import 'package:meta/meta.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-import 'theatre_response.dart';
+import '../../../utils/utils.dart';
+import '../../serializers.dart';
 
-class LocationResponse {
-  final List<double> coordinates;
+part 'user_response.g.dart';
 
-  LocationResponse._(this.coordinates);
+abstract class LocationResponse
+    implements Built<LocationResponse, LocationResponseBuilder> {
+  @BuiltValueField(wireName: 'coordinates')
+  BuiltList<double>? get coordinates;
 
-  factory LocationResponse.fromJson(Map map) {
-    final list = map['coordinates'] as List;
-    if (list == null || list.isEmpty) {
-      return LocationResponse._([]);
-    }
+  double? get longitude => coordinates.isNullOrEmpty ? null : coordinates![0];
 
-    final nums = list.cast<num>();
-    return LocationResponse._([
-      nums[0].toDouble(),
-      nums[1].toDouble(),
-    ]);
-  }
+  double? get latitude => coordinates.isNullOrEmpty ? null : coordinates![1];
 
-  double get longitude => coordinates.isEmpty ? null : coordinates[0];
+  LocationResponse._();
 
-  double get latitude => coordinates.isEmpty ? null : coordinates[1];
+  factory LocationResponse([void Function(LocationResponseBuilder) updates]) =
+      _$LocationResponse;
+
+  static Serializer<LocationResponse> get serializer =>
+      _$locationResponseSerializer;
+
+  factory LocationResponse.fromJson(Map<String, Object?> json) =>
+      serializers.deserializeWith<LocationResponse>(serializer, json)!;
+
+  Map<String, Object?> toJson() =>
+      serializers.serializeWith(serializer, this) as Map<String, Object?>;
 }
 
-class UserResponse {
-  final String uid;
+abstract class UserResponse
+    implements Built<UserResponse, UserResponseBuilder> {
+  @BuiltValueField(wireName: 'uid')
+  String get uid;
 
-  final String email;
+  @BuiltValueField(wireName: 'email')
+  String get email;
 
-  final String phone_number;
+  @BuiltValueField(wireName: 'phone_number')
+  String? get phoneNumber;
 
-  final String full_name;
+  @BuiltValueField(wireName: 'full_name')
+  String get fullName;
 
-  final String gender;
+  @BuiltValueField(wireName: 'gender')
+  String get gender;
 
-  final String avatar;
+  @BuiltValueField(wireName: 'avatar')
+  String? get avatar;
 
-  final String address;
+  @BuiltValueField(wireName: 'address')
+  String? get address;
 
-  final DateTime birthday;
+  @BuiltValueField(wireName: 'birthday')
+  DateTime? get birthday;
 
-  final LocationResponse location;
+  @BuiltValueField(wireName: 'location')
+  LocationResponse? get location;
 
-  final bool is_completed;
+  @BuiltValueField(wireName: 'is_completed')
+  bool get isCompleted;
 
-  final bool is_active;
+  @BuiltValueField(wireName: 'is_active')
+  bool? get isActive;
 
-  final String role;
+  String get role;
 
-  final TheatreResponse theatre;
+  UserResponse._();
 
-  UserResponse({
-    @required this.uid,
-    @required this.email,
-    @required this.phone_number,
-    @required this.full_name,
-    @required this.gender,
-    @required this.avatar,
-    @required this.address,
-    @required this.birthday,
-    @required this.location,
-    @required this.is_completed,
-    @required this.is_active,
-    @required this.role,
-    @required this.theatre,
-  });
+  factory UserResponse([void Function(UserResponseBuilder) updates]) =
+      _$UserResponse;
 
-  factory UserResponse.fromJson(Map map) {
-    final theatre = map['theatre'];
-    return UserResponse(
-      uid: map['uid'],
-      email: map['email'],
-      phone_number: map['phone_number'],
-      full_name: map['full_name'],
-      gender: map['gender'],
-      avatar: map['avatar'],
-      address: map['address'],
-      birthday: map['birthday'] != null
-          ? DateTime.parse(map['birthday']).toLocal()
-          : null,
-      location: map['location'] != null
-          ? LocationResponse.fromJson(map['location'])
-          : null,
-      is_completed: map['is_completed'],
-      is_active: map['is_active'],
-      role: map['role'],
-      theatre: theatre == null ? null : TheatreResponse.fromJson(theatre),
-    );
-  }
+  static Serializer<UserResponse> get serializer => _$userResponseSerializer;
+
+  factory UserResponse.fromJson(Map<String, Object?> json) =>
+      serializers.deserializeWith<UserResponse>(serializer, json)!;
+
+  Map<String, Object?> toJson() =>
+      serializers.serializeWith(serializer, this) as Map<String, Object?>;
 }
