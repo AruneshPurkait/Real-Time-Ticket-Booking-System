@@ -10,21 +10,20 @@ class _$ProductAndQuantity extends ProductAndQuantity {
   @override
   final String id;
   @override
-  final Product product;
+  final Product? product;
   @override
   final int quantity;
 
   factory _$ProductAndQuantity(
-          [void Function(ProductAndQuantityBuilder) updates]) =>
+          [void Function(ProductAndQuantityBuilder)? updates]) =>
       (new ProductAndQuantityBuilder()..update(updates)).build();
 
-  _$ProductAndQuantity._({this.id, this.product, this.quantity}) : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('ProductAndQuantity', 'id');
-    }
-    if (quantity == null) {
-      throw new BuiltValueNullFieldError('ProductAndQuantity', 'quantity');
-    }
+  _$ProductAndQuantity._(
+      {required this.id, this.product, required this.quantity})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(id, 'ProductAndQuantity', 'id');
+    BuiltValueNullFieldError.checkNotNull(
+        quantity, 'ProductAndQuantity', 'quantity');
   }
 
   @override
@@ -63,27 +62,28 @@ class _$ProductAndQuantity extends ProductAndQuantity {
 
 class ProductAndQuantityBuilder
     implements Builder<ProductAndQuantity, ProductAndQuantityBuilder> {
-  _$ProductAndQuantity _$v;
+  _$ProductAndQuantity? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  ProductBuilder _product;
+  ProductBuilder? _product;
   ProductBuilder get product => _$this._product ??= new ProductBuilder();
-  set product(ProductBuilder product) => _$this._product = product;
+  set product(ProductBuilder? product) => _$this._product = product;
 
-  int _quantity;
-  int get quantity => _$this._quantity;
-  set quantity(int quantity) => _$this._quantity = quantity;
+  int? _quantity;
+  int? get quantity => _$this._quantity;
+  set quantity(int? quantity) => _$this._quantity = quantity;
 
   ProductAndQuantityBuilder();
 
   ProductAndQuantityBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _product = _$v.product?.toBuilder();
-      _quantity = _$v.quantity;
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _product = $v.product?.toBuilder();
+      _quantity = $v.quantity;
       _$v = null;
     }
     return this;
@@ -91,14 +91,12 @@ class ProductAndQuantityBuilder
 
   @override
   void replace(ProductAndQuantity other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$ProductAndQuantity;
   }
 
   @override
-  void update(void Function(ProductAndQuantityBuilder) updates) {
+  void update(void Function(ProductAndQuantityBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -108,9 +106,13 @@ class ProductAndQuantityBuilder
     try {
       _$result = _$v ??
           new _$ProductAndQuantity._(
-              id: id, product: _product?.build(), quantity: quantity);
+              id: BuiltValueNullFieldError.checkNotNull(
+                  id, 'ProductAndQuantity', 'id'),
+              product: _product?.build(),
+              quantity: BuiltValueNullFieldError.checkNotNull(
+                  quantity, 'ProductAndQuantity', 'quantity'));
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'product';
         _product?.build();
@@ -145,74 +147,60 @@ class _$Reservation extends Reservation {
   @override
   final String showTimeId;
   @override
-  final ShowTime showTime;
+  final ShowTime? showTime;
   @override
   final int totalPrice;
   @override
   final DateTime updatedAt;
   @override
-  final User user;
+  final User? user;
   @override
-  final BuiltList<Ticket> tickets;
+  final BuiltList<Ticket>? tickets;
   @override
-  final String promotionId;
+  final String? promotionId;
   @override
-  final Promotion promotion;
+  final Promotion? promotion;
 
-  factory _$Reservation([void Function(ReservationBuilder) updates]) =>
+  factory _$Reservation([void Function(ReservationBuilder)? updates]) =>
       (new ReservationBuilder()..update(updates)).build();
 
   _$Reservation._(
-      {this.id,
-      this.createdAt,
-      this.email,
-      this.isActive,
-      this.originalPrice,
-      this.paymentIntentId,
-      this.phoneNumber,
-      this.productIdWithCounts,
-      this.showTimeId,
+      {required this.id,
+      required this.createdAt,
+      required this.email,
+      required this.isActive,
+      required this.originalPrice,
+      required this.paymentIntentId,
+      required this.phoneNumber,
+      required this.productIdWithCounts,
+      required this.showTimeId,
       this.showTime,
-      this.totalPrice,
-      this.updatedAt,
+      required this.totalPrice,
+      required this.updatedAt,
       this.user,
       this.tickets,
       this.promotionId,
       this.promotion})
       : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'id');
-    }
-    if (createdAt == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'createdAt');
-    }
-    if (email == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'email');
-    }
-    if (isActive == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'isActive');
-    }
-    if (originalPrice == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'originalPrice');
-    }
-    if (paymentIntentId == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'paymentIntentId');
-    }
-    if (phoneNumber == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'phoneNumber');
-    }
-    if (productIdWithCounts == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'productIdWithCounts');
-    }
-    if (showTimeId == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'showTimeId');
-    }
-    if (totalPrice == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'totalPrice');
-    }
-    if (updatedAt == null) {
-      throw new BuiltValueNullFieldError('Reservation', 'updatedAt');
-    }
+    BuiltValueNullFieldError.checkNotNull(id, 'Reservation', 'id');
+    BuiltValueNullFieldError.checkNotNull(
+        createdAt, 'Reservation', 'createdAt');
+    BuiltValueNullFieldError.checkNotNull(email, 'Reservation', 'email');
+    BuiltValueNullFieldError.checkNotNull(isActive, 'Reservation', 'isActive');
+    BuiltValueNullFieldError.checkNotNull(
+        originalPrice, 'Reservation', 'originalPrice');
+    BuiltValueNullFieldError.checkNotNull(
+        paymentIntentId, 'Reservation', 'paymentIntentId');
+    BuiltValueNullFieldError.checkNotNull(
+        phoneNumber, 'Reservation', 'phoneNumber');
+    BuiltValueNullFieldError.checkNotNull(
+        productIdWithCounts, 'Reservation', 'productIdWithCounts');
+    BuiltValueNullFieldError.checkNotNull(
+        showTimeId, 'Reservation', 'showTimeId');
+    BuiltValueNullFieldError.checkNotNull(
+        totalPrice, 'Reservation', 'totalPrice');
+    BuiltValueNullFieldError.checkNotNull(
+        updatedAt, 'Reservation', 'updatedAt');
   }
 
   @override
@@ -307,98 +295,100 @@ class _$Reservation extends Reservation {
 }
 
 class ReservationBuilder implements Builder<Reservation, ReservationBuilder> {
-  _$Reservation _$v;
+  _$Reservation? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  DateTime _createdAt;
-  DateTime get createdAt => _$this._createdAt;
-  set createdAt(DateTime createdAt) => _$this._createdAt = createdAt;
+  DateTime? _createdAt;
+  DateTime? get createdAt => _$this._createdAt;
+  set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
-  String _email;
-  String get email => _$this._email;
-  set email(String email) => _$this._email = email;
+  String? _email;
+  String? get email => _$this._email;
+  set email(String? email) => _$this._email = email;
 
-  bool _isActive;
-  bool get isActive => _$this._isActive;
-  set isActive(bool isActive) => _$this._isActive = isActive;
+  bool? _isActive;
+  bool? get isActive => _$this._isActive;
+  set isActive(bool? isActive) => _$this._isActive = isActive;
 
-  int _originalPrice;
-  int get originalPrice => _$this._originalPrice;
-  set originalPrice(int originalPrice) => _$this._originalPrice = originalPrice;
+  int? _originalPrice;
+  int? get originalPrice => _$this._originalPrice;
+  set originalPrice(int? originalPrice) =>
+      _$this._originalPrice = originalPrice;
 
-  String _paymentIntentId;
-  String get paymentIntentId => _$this._paymentIntentId;
-  set paymentIntentId(String paymentIntentId) =>
+  String? _paymentIntentId;
+  String? get paymentIntentId => _$this._paymentIntentId;
+  set paymentIntentId(String? paymentIntentId) =>
       _$this._paymentIntentId = paymentIntentId;
 
-  String _phoneNumber;
-  String get phoneNumber => _$this._phoneNumber;
-  set phoneNumber(String phoneNumber) => _$this._phoneNumber = phoneNumber;
+  String? _phoneNumber;
+  String? get phoneNumber => _$this._phoneNumber;
+  set phoneNumber(String? phoneNumber) => _$this._phoneNumber = phoneNumber;
 
-  ListBuilder<ProductAndQuantity> _productIdWithCounts;
+  ListBuilder<ProductAndQuantity>? _productIdWithCounts;
   ListBuilder<ProductAndQuantity> get productIdWithCounts =>
       _$this._productIdWithCounts ??= new ListBuilder<ProductAndQuantity>();
   set productIdWithCounts(
-          ListBuilder<ProductAndQuantity> productIdWithCounts) =>
+          ListBuilder<ProductAndQuantity>? productIdWithCounts) =>
       _$this._productIdWithCounts = productIdWithCounts;
 
-  String _showTimeId;
-  String get showTimeId => _$this._showTimeId;
-  set showTimeId(String showTimeId) => _$this._showTimeId = showTimeId;
+  String? _showTimeId;
+  String? get showTimeId => _$this._showTimeId;
+  set showTimeId(String? showTimeId) => _$this._showTimeId = showTimeId;
 
-  ShowTime _showTime;
-  ShowTime get showTime => _$this._showTime;
-  set showTime(ShowTime showTime) => _$this._showTime = showTime;
+  ShowTimeBuilder? _showTime;
+  ShowTimeBuilder get showTime => _$this._showTime ??= new ShowTimeBuilder();
+  set showTime(ShowTimeBuilder? showTime) => _$this._showTime = showTime;
 
-  int _totalPrice;
-  int get totalPrice => _$this._totalPrice;
-  set totalPrice(int totalPrice) => _$this._totalPrice = totalPrice;
+  int? _totalPrice;
+  int? get totalPrice => _$this._totalPrice;
+  set totalPrice(int? totalPrice) => _$this._totalPrice = totalPrice;
 
-  DateTime _updatedAt;
-  DateTime get updatedAt => _$this._updatedAt;
-  set updatedAt(DateTime updatedAt) => _$this._updatedAt = updatedAt;
+  DateTime? _updatedAt;
+  DateTime? get updatedAt => _$this._updatedAt;
+  set updatedAt(DateTime? updatedAt) => _$this._updatedAt = updatedAt;
 
-  User _user;
-  User get user => _$this._user;
-  set user(User user) => _$this._user = user;
+  UserBuilder? _user;
+  UserBuilder get user => _$this._user ??= new UserBuilder();
+  set user(UserBuilder? user) => _$this._user = user;
 
-  ListBuilder<Ticket> _tickets;
+  ListBuilder<Ticket>? _tickets;
   ListBuilder<Ticket> get tickets =>
       _$this._tickets ??= new ListBuilder<Ticket>();
-  set tickets(ListBuilder<Ticket> tickets) => _$this._tickets = tickets;
+  set tickets(ListBuilder<Ticket>? tickets) => _$this._tickets = tickets;
 
-  String _promotionId;
-  String get promotionId => _$this._promotionId;
-  set promotionId(String promotionId) => _$this._promotionId = promotionId;
+  String? _promotionId;
+  String? get promotionId => _$this._promotionId;
+  set promotionId(String? promotionId) => _$this._promotionId = promotionId;
 
-  PromotionBuilder _promotion;
+  PromotionBuilder? _promotion;
   PromotionBuilder get promotion =>
       _$this._promotion ??= new PromotionBuilder();
-  set promotion(PromotionBuilder promotion) => _$this._promotion = promotion;
+  set promotion(PromotionBuilder? promotion) => _$this._promotion = promotion;
 
   ReservationBuilder();
 
   ReservationBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _createdAt = _$v.createdAt;
-      _email = _$v.email;
-      _isActive = _$v.isActive;
-      _originalPrice = _$v.originalPrice;
-      _paymentIntentId = _$v.paymentIntentId;
-      _phoneNumber = _$v.phoneNumber;
-      _productIdWithCounts = _$v.productIdWithCounts?.toBuilder();
-      _showTimeId = _$v.showTimeId;
-      _showTime = _$v.showTime;
-      _totalPrice = _$v.totalPrice;
-      _updatedAt = _$v.updatedAt;
-      _user = _$v.user;
-      _tickets = _$v.tickets?.toBuilder();
-      _promotionId = _$v.promotionId;
-      _promotion = _$v.promotion?.toBuilder();
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _createdAt = $v.createdAt;
+      _email = $v.email;
+      _isActive = $v.isActive;
+      _originalPrice = $v.originalPrice;
+      _paymentIntentId = $v.paymentIntentId;
+      _phoneNumber = $v.phoneNumber;
+      _productIdWithCounts = $v.productIdWithCounts.toBuilder();
+      _showTimeId = $v.showTimeId;
+      _showTime = $v.showTime?.toBuilder();
+      _totalPrice = $v.totalPrice;
+      _updatedAt = $v.updatedAt;
+      _user = $v.user?.toBuilder();
+      _tickets = $v.tickets?.toBuilder();
+      _promotionId = $v.promotionId;
+      _promotion = $v.promotion?.toBuilder();
       _$v = null;
     }
     return this;
@@ -406,14 +396,12 @@ class ReservationBuilder implements Builder<Reservation, ReservationBuilder> {
 
   @override
   void replace(Reservation other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$Reservation;
   }
 
   @override
-  void update(void Function(ReservationBuilder) updates) {
+  void update(void Function(ReservationBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -423,28 +411,43 @@ class ReservationBuilder implements Builder<Reservation, ReservationBuilder> {
     try {
       _$result = _$v ??
           new _$Reservation._(
-              id: id,
-              createdAt: createdAt,
-              email: email,
-              isActive: isActive,
-              originalPrice: originalPrice,
-              paymentIntentId: paymentIntentId,
-              phoneNumber: phoneNumber,
+              id: BuiltValueNullFieldError.checkNotNull(
+                  id, 'Reservation', 'id'),
+              createdAt: BuiltValueNullFieldError.checkNotNull(
+                  createdAt, 'Reservation', 'createdAt'),
+              email: BuiltValueNullFieldError.checkNotNull(
+                  email, 'Reservation', 'email'),
+              isActive: BuiltValueNullFieldError.checkNotNull(
+                  isActive, 'Reservation', 'isActive'),
+              originalPrice: BuiltValueNullFieldError.checkNotNull(
+                  originalPrice, 'Reservation', 'originalPrice'),
+              paymentIntentId: BuiltValueNullFieldError.checkNotNull(
+                  paymentIntentId, 'Reservation', 'paymentIntentId'),
+              phoneNumber: BuiltValueNullFieldError.checkNotNull(
+                  phoneNumber, 'Reservation', 'phoneNumber'),
               productIdWithCounts: productIdWithCounts.build(),
-              showTimeId: showTimeId,
-              showTime: showTime,
-              totalPrice: totalPrice,
-              updatedAt: updatedAt,
-              user: user,
+              showTimeId: BuiltValueNullFieldError.checkNotNull(
+                  showTimeId, 'Reservation', 'showTimeId'),
+              showTime: _showTime?.build(),
+              totalPrice: BuiltValueNullFieldError.checkNotNull(
+                  totalPrice, 'Reservation', 'totalPrice'),
+              updatedAt:
+                  BuiltValueNullFieldError.checkNotNull(updatedAt, 'Reservation', 'updatedAt'),
+              user: _user?.build(),
               tickets: _tickets?.build(),
               promotionId: promotionId,
               promotion: _promotion?.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'productIdWithCounts';
         productIdWithCounts.build();
 
+        _$failedField = 'showTime';
+        _showTime?.build();
+
+        _$failedField = 'user';
+        _user?.build();
         _$failedField = 'tickets';
         _tickets?.build();
 

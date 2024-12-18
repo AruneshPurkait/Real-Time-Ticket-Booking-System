@@ -1,64 +1,60 @@
-import 'package:meta/meta.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
 
-import 'age_type.dart';
 import 'category.dart';
 import 'person.dart';
 
-class Movie {
-  final String id;
+part 'movie.g.dart';
 
-  final bool isActive;
+enum AgeType {
+  P,
+  C13,
+  C16,
+  C18,
+}
 
-  final String title;
+abstract class Movie implements Built<Movie, MovieBuilder> {
+  String get id;
 
-  final String trailerVideoUrl;
+  bool get isActive;
 
-  final String posterUrl;
+  BuiltList<String> get actorIds;
 
-  final String overview;
+  BuiltList<String> get directorIds;
 
-  final DateTime releasedDate;
+  String get title;
 
-  final int duration;
+  String? get trailerVideoUrl;
 
-  final String originalLanguage;
+  String? get posterUrl;
 
-  final DateTime createdAt;
+  String? get overview;
 
-  final DateTime updatedAt;
+  DateTime get releasedDate;
 
-  final AgeType ageType;
+  int get duration;
 
-  final List<Person> actors;
+  String get originalLanguage;
 
-  final List<Person> directors;
+  DateTime get createdAt;
 
-  final List<Category> categories;
+  DateTime get updatedAt;
 
-  final double rateStar;
+  AgeType get ageType;
 
-  final int totalFavorite;
+  BuiltList<Person>? get actors;
 
-  final int totalRate;
+  BuiltList<Person>? get directors;
 
-  Movie({
-    @required this.id,
-    @required this.isActive,
-    @required this.title,
-    @required this.trailerVideoUrl,
-    @required this.posterUrl,
-    @required this.overview,
-    @required this.releasedDate,
-    @required this.duration,
-    @required this.originalLanguage,
-    @required this.createdAt,
-    @required this.updatedAt,
-    @required this.ageType,
-    @required this.actors,
-    @required this.directors,
-    @required this.categories,
-    @required this.rateStar,
-    @required this.totalFavorite,
-    @required this.totalRate,
-  });
+  BuiltList<Category>? get categories;
+
+  double get rateStar;
+
+  int get totalFavorite;
+
+  int get totalRate;
+
+  Movie._();
+
+  factory Movie([void Function(MovieBuilder) updates]) = _$Movie;
 }

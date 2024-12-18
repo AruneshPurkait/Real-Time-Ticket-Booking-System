@@ -2,14 +2,14 @@ class NotCompletedLoginException implements Exception {
   const NotCompletedLoginException();
 }
 
-class NotCompletedManagerUserException implements Exception {
-  const NotCompletedManagerUserException();
+class WrongRoleException implements Exception {
+  const WrongRoleException();
 }
 
 class NotLoggedInException implements Exception {
   const NotLoggedInException();
 }
 
-class WrongRoleException implements Exception {
-  const WrongRoleException();
+class NotVerifiedEmail implements Exception {
+  const NotVerifiedEmail();
 }

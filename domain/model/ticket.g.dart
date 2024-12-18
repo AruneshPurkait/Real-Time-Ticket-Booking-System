@@ -14,7 +14,7 @@ class _$Ticket extends Ticket {
   @override
   final int price;
   @override
-  final String reservationId;
+  final String? reservationId;
   @override
   final Seat seat;
   @override
@@ -24,43 +24,29 @@ class _$Ticket extends Ticket {
   @override
   final DateTime updatedAt;
   @override
-  final Reservation reservation;
+  final Reservation? reservation;
 
-  factory _$Ticket([void Function(TicketBuilder) updates]) =>
+  factory _$Ticket([void Function(TicketBuilder)? updates]) =>
       (new TicketBuilder()..update(updates)).build();
 
   _$Ticket._(
-      {this.id,
-      this.is_active,
-      this.price,
+      {required this.id,
+      required this.is_active,
+      required this.price,
       this.reservationId,
-      this.seat,
-      this.show_time,
-      this.createdAt,
-      this.updatedAt,
+      required this.seat,
+      required this.show_time,
+      required this.createdAt,
+      required this.updatedAt,
       this.reservation})
       : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'id');
-    }
-    if (is_active == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'is_active');
-    }
-    if (price == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'price');
-    }
-    if (seat == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'seat');
-    }
-    if (show_time == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'show_time');
-    }
-    if (createdAt == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'createdAt');
-    }
-    if (updatedAt == null) {
-      throw new BuiltValueNullFieldError('Ticket', 'updatedAt');
-    }
+    BuiltValueNullFieldError.checkNotNull(id, 'Ticket', 'id');
+    BuiltValueNullFieldError.checkNotNull(is_active, 'Ticket', 'is_active');
+    BuiltValueNullFieldError.checkNotNull(price, 'Ticket', 'price');
+    BuiltValueNullFieldError.checkNotNull(seat, 'Ticket', 'seat');
+    BuiltValueNullFieldError.checkNotNull(show_time, 'Ticket', 'show_time');
+    BuiltValueNullFieldError.checkNotNull(createdAt, 'Ticket', 'createdAt');
+    BuiltValueNullFieldError.checkNotNull(updatedAt, 'Ticket', 'updatedAt');
   }
 
   @override
@@ -120,60 +106,61 @@ class _$Ticket extends Ticket {
 }
 
 class TicketBuilder implements Builder<Ticket, TicketBuilder> {
-  _$Ticket _$v;
+  _$Ticket? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  bool _is_active;
-  bool get is_active => _$this._is_active;
-  set is_active(bool is_active) => _$this._is_active = is_active;
+  bool? _is_active;
+  bool? get is_active => _$this._is_active;
+  set is_active(bool? is_active) => _$this._is_active = is_active;
 
-  int _price;
-  int get price => _$this._price;
-  set price(int price) => _$this._price = price;
+  int? _price;
+  int? get price => _$this._price;
+  set price(int? price) => _$this._price = price;
 
-  String _reservationId;
-  String get reservationId => _$this._reservationId;
-  set reservationId(String reservationId) =>
+  String? _reservationId;
+  String? get reservationId => _$this._reservationId;
+  set reservationId(String? reservationId) =>
       _$this._reservationId = reservationId;
 
-  SeatBuilder _seat;
+  SeatBuilder? _seat;
   SeatBuilder get seat => _$this._seat ??= new SeatBuilder();
-  set seat(SeatBuilder seat) => _$this._seat = seat;
+  set seat(SeatBuilder? seat) => _$this._seat = seat;
 
-  String _show_time;
-  String get show_time => _$this._show_time;
-  set show_time(String show_time) => _$this._show_time = show_time;
+  String? _show_time;
+  String? get show_time => _$this._show_time;
+  set show_time(String? show_time) => _$this._show_time = show_time;
 
-  DateTime _createdAt;
-  DateTime get createdAt => _$this._createdAt;
-  set createdAt(DateTime createdAt) => _$this._createdAt = createdAt;
+  DateTime? _createdAt;
+  DateTime? get createdAt => _$this._createdAt;
+  set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
-  DateTime _updatedAt;
-  DateTime get updatedAt => _$this._updatedAt;
-  set updatedAt(DateTime updatedAt) => _$this._updatedAt = updatedAt;
+  DateTime? _updatedAt;
+  DateTime? get updatedAt => _$this._updatedAt;
+  set updatedAt(DateTime? updatedAt) => _$this._updatedAt = updatedAt;
 
-  ReservationBuilder _reservation;
+  ReservationBuilder? _reservation;
   ReservationBuilder get reservation =>
       _$this._reservation ??= new ReservationBuilder();
-  set reservation(ReservationBuilder reservation) =>
+  set reservation(ReservationBuilder? reservation) =>
       _$this._reservation = reservation;
 
   TicketBuilder();
 
   TicketBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _is_active = _$v.is_active;
-      _price = _$v.price;
-      _reservationId = _$v.reservationId;
-      _seat = _$v.seat?.toBuilder();
-      _show_time = _$v.show_time;
-      _createdAt = _$v.createdAt;
-      _updatedAt = _$v.updatedAt;
-      _reservation = _$v.reservation?.toBuilder();
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _is_active = $v.is_active;
+      _price = $v.price;
+      _reservationId = $v.reservationId;
+      _seat = $v.seat.toBuilder();
+      _show_time = $v.show_time;
+      _createdAt = $v.createdAt;
+      _updatedAt = $v.updatedAt;
+      _reservation = $v.reservation?.toBuilder();
       _$v = null;
     }
     return this;
@@ -181,14 +168,12 @@ class TicketBuilder implements Builder<Ticket, TicketBuilder> {
 
   @override
   void replace(Ticket other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$Ticket;
   }
 
   @override
-  void update(void Function(TicketBuilder) updates) {
+  void update(void Function(TicketBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -198,17 +183,22 @@ class TicketBuilder implements Builder<Ticket, TicketBuilder> {
     try {
       _$result = _$v ??
           new _$Ticket._(
-              id: id,
-              is_active: is_active,
-              price: price,
+              id: BuiltValueNullFieldError.checkNotNull(id, 'Ticket', 'id'),
+              is_active: BuiltValueNullFieldError.checkNotNull(
+                  is_active, 'Ticket', 'is_active'),
+              price: BuiltValueNullFieldError.checkNotNull(
+                  price, 'Ticket', 'price'),
               reservationId: reservationId,
               seat: seat.build(),
-              show_time: show_time,
-              createdAt: createdAt,
-              updatedAt: updatedAt,
+              show_time: BuiltValueNullFieldError.checkNotNull(
+                  show_time, 'Ticket', 'show_time'),
+              createdAt: BuiltValueNullFieldError.checkNotNull(
+                  createdAt, 'Ticket', 'createdAt'),
+              updatedAt: BuiltValueNullFieldError.checkNotNull(
+                  updatedAt, 'Ticket', 'updatedAt'),
               reservation: _reservation?.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'seat';
         seat.build();

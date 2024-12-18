@@ -1,46 +1,44 @@
-import 'package:meta/meta.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
 
 import 'location.dart';
 
-class Theatre {
-  final Location location;
-  final bool isActive;
-  final List<String> rooms;
-  final String id;
-  final String name;
-  final String address;
-  final String phoneNumber;
-  final String description;
-  final String email;
-  final String openingHours;
-  final String roomSummary;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String cover;
-  final String thumbnail;
+part 'theatre.g.dart';
 
-  Theatre({
-    @required this.location,
-    @required this.isActive,
-    @required this.rooms,
-    @required this.id,
-    @required this.name,
-    @required this.address,
-    @required this.phoneNumber,
-    @required this.description,
-    @required this.email,
-    @required this.openingHours,
-    @required this.roomSummary,
-    @required this.createdAt,
-    @required this.updatedAt,
-    @required this.cover,
-    @required this.thumbnail,
-  });
+abstract class Theatre implements Built<Theatre, TheatreBuilder> {
+  String get id;
 
-  @override
-  String toString() =>
-      'Theatre{location: $location, isActive: $isActive, rooms: $rooms, id: $id,'
-      ' name: $name, address: $address, phoneNumber: $phoneNumber, description:'
-      ' $description, email: $email, openingHours: $openingHours, roomSummary: $roomSummary,'
-      ' createdAt: $createdAt, updatedAt: $updatedAt, cover: $cover, thumbnail: $thumbnail}';
+  Location get location;
+
+  bool get is_active;
+
+  BuiltList<String> get rooms;
+
+  String get name;
+
+  String get address;
+
+  String get phone_number;
+
+  String get description;
+
+  String? get email;
+
+  String get opening_hours;
+
+  String get room_summary;
+
+  DateTime get createdAt;
+
+  DateTime get updatedAt;
+
+  double? get distance;
+
+  String get thumbnail;
+
+  String get cover;
+
+  Theatre._();
+
+  factory Theatre([void Function(TheatreBuilder) updates]) = _$Theatre;
 }

@@ -1,12 +1,13 @@
-import 'package:meta/meta.dart';
+import 'package:built_value/built_value.dart';
 
-class Location {
-  final double latitude;
+part 'location.g.dart';
 
-  final double longitude;
+abstract class Location implements Built<Location, LocationBuilder> {
+  double get latitude;
 
-  Location({
-    @required this.latitude,
-    @required this.longitude,
-  });
+  double get longitude;
+
+  Location._();
+
+  factory Location([void Function(LocationBuilder) updates]) = _$Location;
 }
